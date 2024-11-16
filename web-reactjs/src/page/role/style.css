@@ -1,0 +1,40 @@
+/* .list-role {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
+  background-color: darkseagreen;
+  padding: 1rem;
+  border-radius: 1rem;
+  font-size: 1rem;
+  margin: 1rem 0;
+}
+.profile {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: burlywood;
+}
+.profile > img {
+  width: 100%;
+}
+
+.infor {
+  flex-grow: 1;
+}
+
+label {
+  margin-top: 2rem ;
+  margin-left: 0.3rem;
+}
+.btnM {
+   display: flex;
+   justify-content: flex-end;
+  margin:  10px 0 0 0;
+}
+
+.No-data{
+    font-size: 1.3rem;
+text-align: center;
+padding-top: 300px;
+} */
