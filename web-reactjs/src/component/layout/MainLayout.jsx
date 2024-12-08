@@ -1,24 +1,42 @@
 import "./styleMainLayout.css";
+import { TbBrandProducthunt } from "react-icons/tb";
+
 // Import FontAwesome and the specific icon you need
 // import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 // import { faBars } from "@fortawesome/free-solid-svg-icons"; // Import faBars icon
 
 import logo from "../../assets/Image/logo/Mylogo.png";
-import profile_image from "../../assets/Image/logo/laylonghav.jpg";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react";
+import profile_image from "../../assets/Image/logo/Image_default.png";
 import {
-  DesktopOutlined,
-  FileOutlined,
-  PieChartOutlined,
-  SmileOutlined,
+  DashboardOutlined,
+  ShoppingCartOutlined,
+  FileTextOutlined,
+  BarChartOutlined,
+  AppstoreAddOutlined,
   TeamOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
-import { Breadcrumb, Dropdown, Layout, Menu, theme } from 'antd';
+  CreditCardOutlined,
+  IdcardOutlined,
+  UserAddOutlined,
+  SettingOutlined,
+  SmileOutlined,
+  ShoppingOutlined,
+  ContainerOutlined,
+  AppstoreOutlined,
+  BranchesOutlined,
+  PayCircleOutlined,
+  DollarOutlined,
+  GlobalOutlined,
+  DatabaseOutlined,
+  EyeOutlined,
+} from "@ant-design/icons";
+import { Dropdown, Image, Layout, Menu, Space, theme } from "antd";
+import { profileStore } from "../../store/profileStore";
 import { Outlet, useNavigate } from "react-router-dom";
 import Search from "antd/es/transfer/search";
 import { IoIosNotifications } from "react-icons/io";
 import { MdOutlineMarkEmailUnread } from "react-icons/md";
+import config from "../../util/config";
 const { Header, Content, Footer, Sider } = Layout;
 function getItem(label, key, icon, children) {
   return {
@@ -29,31 +47,65 @@ function getItem(label, key, icon, children) {
   };
 }
 const items = [
-  getItem("DashDashaboard", "/", <PieChartOutlined />),
-  getItem("Customer", "/customer", <DesktopOutlined />),
-  getItem("Supplier", "/supplier", <DesktopOutlined />),
-  getItem("About", "/about", <DesktopOutlined />),
-  getItem("Product", "/product", <DesktopOutlined />),
-  getItem("Role", "/role", <DesktopOutlined />),
-  getItem("User", "/user", <UserOutlined />, [
-    getItem("Tom", "3"),
-    getItem("Bill", "4"),
-    getItem("Alex", "5"),
+  getItem("Dashboard", "/", <DashboardOutlined />),
+  getItem("POS", "/pos", <ShoppingCartOutlined />),
+  getItem("Order", "/order", <FileTextOutlined />),
+  getItem("Reports", "report", <BarChartOutlined />, [
+    getItem("Top Sale", "/report/top_sale", <ShoppingOutlined />),
+    getItem("Order", "/report/order", <FileTextOutlined />),
+    getItem("Purchase", "/report/purchase", <ContainerOutlined />),
+    getItem("Expense", "/report/expense", <CreditCardOutlined />),
   ]),
-  getItem("Team", "sub2", <TeamOutlined />, [
-    getItem("Team 1", "6"),
-    getItem("Team 2", "8"),
+  getItem("Inventory", "inventory", <AppstoreAddOutlined />, [
+    getItem("Products", "/product", <AppstoreOutlined />),
+    getItem("Category", "/category", <AppstoreOutlined />),
+    getItem("Brand", "/brand", <TbBrandProducthunt />),
+    getItem("Stock", "/stock", <DatabaseOutlined />),
   ]),
-  getItem("Files", "9", <FileOutlined />),
+  getItem("Customer", "customer", <TeamOutlined />, [
+    getItem("Customer", "/customer", <TeamOutlined />),
+    getItem("Customer type", "/customer_type", <TeamOutlined />),
+  ]),
+  getItem("Expense", "expense", <CreditCardOutlined />, [
+    getItem("Expenses", "/expense", <CreditCardOutlined />),
+    getItem("Expense Types", "/expense_type", <PayCircleOutlined />),
+  ]),
+  getItem("Employee", "employee", <IdcardOutlined />, [
+    getItem("Employee List", "/employee", <IdcardOutlined />),
+    getItem("Payroll", "/payroll", <PayCircleOutlined />),
+  ]),
+  getItem("User", "/user", <UserAddOutlined />, [
+    getItem("User List", "/user", <UserAddOutlined />),
+    getItem("User Role", "/role", <UserAddOutlined />),
+    getItem("Permission", "/permission", <SettingOutlined />),
+  ]),
+  getItem("Setting", "setting", <SettingOutlined />, [
+    getItem("Language", "/lang", <GlobalOutlined />), // Updated icon for Language
+    getItem("Currency", "/currency", <DollarOutlined />), // Updated icon for Currency
+    getItem("Payment Method", "/payment_method", <PayCircleOutlined />),
+    getItem("Province", "/province", <BranchesOutlined />),
+  ]),
 ];
-const MainLayout = () => {
-  const navigate = useNavigate();
 
+const MainLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
+  const { profile, setProfile, logout } = profileStore.getState();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!profile) {
+      navigate("/login");
+    }
+  }, [profile, navigate]);
+
+  if (!profile) {
+    // Avoid rendering the layout if the user is not logged in
+    return null;
+  }
 
   const itemDroptown = [
     {
@@ -73,9 +125,10 @@ const MainLayout = () => {
     },
   ];
 
-    const LOGOUT = () => {
-      navigate("/login");
-    };
+  const LOGOUT = () => {
+    logout();
+    navigate("/login");
+  };
 
   return (
     <Layout
@@ -98,25 +151,25 @@ const MainLayout = () => {
         />
       </Sider>
       <Layout>
-        <div className="admin-header">
-          <div className="admin-header-g1">
+        <Space className="h-[80px]  bg-gray-100 flex justify-between items-center px-5">
+          <Space className="flex gap-x-5 justify-center items-center">
             <div className="">
-              <img className="Admin-logo" src={logo} alt="Mylogo" />
+              <img className="w-[60px]" src={logo} alt="Mylogo" />
             </div>
-            <div className="Brand">
-              <div className="txt-brand-name">My-POS-CSPUHAV</div>
-              <div className="brandName">Computer & Phone Shop</div>
+            <div className="">
+              <div className="">My-POS-CSPUHAV</div>
+              <div className="">Computer & Phone Shop</div>
             </div>
             <div className="txtSeach">
               <Search placeholder="input search text" enterButton />
             </div>
-          </div>
-          <div className="admin-header-g2">
-            <MdOutlineMarkEmailUnread className="icon-notify" />
-            <IoIosNotifications className="icon-email" />
-            <div className="Lavel_User">
-              <div className="txt-user-name">{}</div>
-              <div className="">{}</div>
+          </Space>
+          <div className="flex justify-center items-center  gap-3">
+            <MdOutlineMarkEmailUnread className="text-5xl" />
+            <IoIosNotifications className="text-5xl" />
+            <div className="flex flex-col gap-y-1">
+              <div className="text-lg font-bold font-mono">{profile?.name}</div>
+              <div className="">{profile?.profile?.type}</div>
             </div>
             {/* <div className="btnLOGOUT">
               {profile && (
@@ -135,17 +188,47 @@ const MainLayout = () => {
                 },
               }}
             >
-              <img className="Profile-User" src={profile_image} alt="Profile" />
+              <div className="w-[60px] h-[60px] rounded-full overflow-hidden">
+                
+                <Image
+                  preview={{
+                    mask: (
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          height: "100%",
+                          color: "#fff",
+                          fontSize: "24px",
+                          background: "rgba(0, 0, 0, 0)",
+                        }}
+                      >
+                        <EyeOutlined /> {/* Eye Icon */}
+                        
+                      </div>
+                    ),
+                  }}
+                  className="w-[100%] overflow-hidden rounded-full"
+                  src={
+                    profile?.profile?.image == null
+                      ? profile_image
+                      : config.image_path + profile?.profile?.image
+                  } //profile?.profile.image
+                  alt="Profile"
+                />
+              </div>
             </Dropdown>
           </div>
-        </div>
+        </Space>
         <Content
+          className="h-[calc(100vh-100px)] overflow-y-auto"
           style={{
             margin: "10px",
           }}
         >
           <div
-            className="Admin-body"
+            className="p-4 min-h-[calc(100vh-100px)]"
             style={{
               background: colorBgContainer,
               borderRadius: borderRadiusLG,
@@ -160,12 +243,6 @@ const MainLayout = () => {
 };
 
 export default MainLayout;
-
-
-
-
-
-
 
 // useEffect(() => {
 //   const toggleButton = document.querySelector(".toggle");
@@ -200,7 +277,8 @@ export default MainLayout;
 //   };
 // }, []);
 
-{/* <div className="navbar">
+{
+  /* <div className="navbar">
   <div className="nav-logo">
     <div className="logo">
       <img src={logo} alt="nav-logo" />
@@ -235,4 +313,5 @@ export default MainLayout;
       <Link to="/about">About Us</Link>
     </li>
   </ul>
-</div>; */}
+</div>; */
+}

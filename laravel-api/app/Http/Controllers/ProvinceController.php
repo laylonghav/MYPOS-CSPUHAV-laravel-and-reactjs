@@ -10,10 +10,39 @@ class ProvinceController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $req)
     {
-        $province = Province::all();
-        return response()->json($province);
+        $validated = $req->validate([
+            'txt_search' => 'nullable|string|max:255',
+            'status' => 'nullable|integer|in:1,0', // Integer validation
+        ]);
+
+
+
+        $province = Province::query();
+
+        if ($req->has('txt_search')) {
+            $searchTerm = $req->input('txt_search');
+            $fields = ['name', 'code', 'region', 'population', 'area'];
+
+            $province->where(function ($query) use ($searchTerm, $fields) {
+                foreach ($fields as $field) {
+                    $query->orWhere($field, 'LIKE', '%' . $searchTerm . '%');
+                }
+        });
+        }
+
+
+        if ($req->has('status')) {
+            $province->where('status', $req->input('status'));
+        }
+
+        $list = $province->get();
+
+        return response()->json([
+            'list' => $list,
+            'query' => $req->all(), // helpful for debugging inputs
+        ]);
     }
 
     /**

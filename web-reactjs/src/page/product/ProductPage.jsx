@@ -20,9 +20,10 @@ function ProductPage() {
   };
   return (
     <div>
-      <h1>ProductPage</h1>
+      {/* <h1>ProductPage</h1> */}
       {/* <h1>{count}</h1> */}
       {/* <h1>{list.length}</h1> */}
+      
       <Row
         gutter={[
           { xs: 2, sm: 4, md: 6, lg: 12, xl: 16 },

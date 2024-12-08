@@ -11,9 +11,31 @@ class CategoryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $req)
     {
-       return Category::all();
+       $validated = $req->validate([
+            'txt_search' => 'nullable|string|max:255',
+            'status' => 'nullable|integer|in:1,0', // Integer validation
+        ]);
+
+
+
+        $category = Category::query();
+
+        if ($req->has('txt_search')) {
+            $category->where('name', 'LIKE', '%' . $req->input('txt_search') . '%');
+        }
+
+        if ($req->has('status')) {
+            $category->where('status', $req->input('status'));
+        }
+
+        $list = $category->get();
+
+        return response()->json([
+            'list' => $list,
+            'query' => $req->all(), // helpful for debugging inputs
+        ]);
     }
 
     /**

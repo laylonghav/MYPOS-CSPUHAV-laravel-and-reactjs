@@ -10,12 +10,38 @@ class RoleController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $req)
     {
         // $total = 2000;
-        return response() -> json([
-            "list"=> Role::all(),
+        // $req = input ("txt_search")
+        // $req = input ("status")
+        // $req = input ("page")
+        // ? where 
+
+        $validated = $req->validate([
+            'txt_search' => 'nullable|string|max:255',
+            'status' => 'nullable|integer|in:1,0', // Integer validation
         ]);
+
+
+
+        $role = Role::query();
+
+        if ($req->has('txt_search')) {
+            $role->where('name', 'LIKE', '%' . $req->input('txt_search') . '%');
+        }
+
+        if ($req->has('status')) {
+            $role->where('status', $req->input('status'));
+        }
+
+        $list = $role->get();
+
+        return response()->json([
+            'list' => $list,
+            'query' => $req->all(), // helpful for debugging inputs
+        ]);
+
         // [
         //     "list" => [
         //         "number" => [1, 2, 3, 4, 5, 6, 7, 8],

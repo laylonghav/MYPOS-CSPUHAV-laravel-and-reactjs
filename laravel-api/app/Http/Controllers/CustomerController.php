@@ -5,15 +5,37 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Customer;
 
-class CustomerController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     */
- public function index()
+    class CustomerController extends Controller
     {
-        $customers = Customer::all();
-        return response()->json($customers);
+        /**
+         * Display a listing of the resource.
+         */
+    public function index(Request $req)
+    {
+         $validated = $req->validate([
+            'txt_search' => 'nullable|string|max:255',
+            'status' => 'nullable|integer|in:1,0', // Integer validation
+        ])                                                                       ;                                                                             
+
+        $customer = Customer::query();
+        if ($req->has('txt_search')) {
+            $searchTerm = $req->input('txt_search');
+            $fields = [ 'first_name', 'last_name', 'email', 'phone', 'address', 'city', 'state', 'zip_code' ];
+
+            $customer->where(function ($query) use ($searchTerm, $fields) {
+                foreach ($fields as $field) {
+                    $query->orWhere($field, 'LIKE', '%' . $searchTerm . '%');
+                }
+            });
+        }
+        if ($req->has('status')) {
+            $customer->where('status', $req->input('status'));
+        }
+        $list = $customer->get();
+        return response()->json([
+            'list' => $list,
+            'query' => $req->all(), // helpful for debugging inputs
+        ]);
     }
 
     /**

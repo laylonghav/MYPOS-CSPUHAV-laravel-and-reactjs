@@ -35,19 +35,42 @@ function RolePage() {
     validate: {},
   });
   const [validate, setValidate] = useState({});
+  const [filter, setFilter] = useState({
+    txt_search: null,
+    status: "",
+  });
+
   const getlist = async () => {
     setState((pre) => ({
       ...pre,
       loading: true,
     }));
-    const res = await request("role", "get");
+    let queryparam = "?page=1";
+    if (filter.txt_search !== null && filter.txt_search !== "") {
+      queryparam += "&txt_search=" + filter.txt_search;
+    }
+    if (filter.status !== null && filter.status !== "") {
+      queryparam += "&status=" + filter.status;
+    }
+    const res = await request("role" + queryparam, "get");
     // console.log(res);
-    if (res) {
+    if (res && !res.errors) {
       setState((pre) => ({
         ...pre,
         list: res.list,
         loading: false,
       }));
+    }else  {
+      setState((pre) => ({
+        ...pre,
+        loading: false,
+      }));
+      if (res.errors?.message) {
+        message.error(res.errors.message); // Show error to the user
+        console.log("Error message:", res.errors.message); // Debug log
+      } else {
+        console.error("Unhandled error format:", res.errors);
+      }
     }
   };
 
@@ -114,28 +137,44 @@ function RolePage() {
     }));
   };
 
-  const onClickDelete = async (item) => {
-    //  alert(JSON.stringify(item));
-    setState((pre) => ({
-      ...pre,
-      loading: true,
-    }));
-    const res = await request("role/" + item.id, "delete");
-    if (res && !res.error) {
-      Modal.confirm({
-        title: "Remove",
-        content: "Are you sure to remove ?",
-        onOk: () => {
-          message.success("Delete Successfully !");
-          getlist();
-        },
-      });
-    }
+  const onClickDelete = (item) => {
+    Modal.confirm({
+      title: "Remove",
+      content: "Are you sure you want to remove this item?",
+      onOk: async () => {
+        setState((pre) => ({
+          ...pre,
+          loading: true,
+        })); // Set loading state to true
+        try {
+          const res = await request("role/" + item.id, "delete");
+          if (res && !res.error) {
+            message.success("Delete Successfully!");
+            getlist(); // Refresh the list
+          } else {
+            message.error(
+              res?.error || "Failed to delete the item. Please try again."
+            );
+          }
+        } catch (error) {
+          message.error("An error occurred while deleting the item.");
+          console.error(error); // Log for debugging
+        } finally {
+          setState((pre) => ({
+            ...pre,
+            loading: false,
+          })); // Reset loading state
+        }
+      },
+      onCancel: () => {
+        message.info("Delete action was canceled.");
+      },
+    });
   };
 
-  const handleFilter =()=>{
-    
-  }
+  const handleFilter = () => {
+    getlist();
+  };
 
   // Filter roles based on the search term
 
@@ -155,17 +194,25 @@ function RolePage() {
             <div>Role {state.list.length}</div>
             <Input.Search
               allowClear
-              style={{ marginLeft: 10 }}
               placeholder="Search"
+              onSearch={getlist}
               onChange={(e) =>
-                setState((prevState) => ({
+                setFilter((prevState) => ({
                   ...prevState,
-                  searchTerm: e.target.value,
+                  txt_search: e.target.value,
                 }))
               }
             />
             <Select
-            placeholder="Select status"
+              className="w-[200px]"
+              allowClear
+              placeholder="Select status"
+              onChange={(value) =>
+                setFilter((prevState) => ({
+                  ...prevState,
+                  status: value !== undefined ? value : null, // Set to null if undefined
+                }))
+              }
               options={[
                 {
                   label: "Active",
@@ -177,7 +224,9 @@ function RolePage() {
                 },
               ]}
             ></Select>
-            <Button type="primary" onClick={handleFilter}>Filter</Button>
+            <Button type="primary" onClick={handleFilter}>
+              Filter
+            </Button>
           </Space>
           <Button type="primary" icon={<MdAdd />} onClick={onClickAddbtn}>
             New

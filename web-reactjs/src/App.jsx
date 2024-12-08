@@ -12,6 +12,10 @@ import MainLayout from "./component/layout/MainLayout";
 import MainLayoutLogin from "./component/layout/MainLayoutLogin";
 import ProductPage from "./page/product/ProductPage";
 import RolePage from "./page/role/RolePage";
+import CategoryPage from "./page/category/CategoryPage";
+import ProvincePage from "./page/province/ProvincePage";
+import CustomerPage from "./page/customer/CustomerPage";
+import BrandPage from "./page/brand/BrandPage";
 function App() {
   const [count, setCount] = useState(0);
 
@@ -24,6 +28,10 @@ function App() {
             <Route path="/about" element={<AboutePage />} />
             <Route path="/product" element={<ProductPage />} />
             <Route path="/role" element={<RolePage />} />
+            <Route path="/category" element={<CategoryPage />} />
+            <Route path="/province" element={<ProvincePage />} />
+            <Route path="/customer" element={<CustomerPage />} />
+            <Route path="/brand" element={<BrandPage />} />
             <Route path="*" element={<RouteNotfound />} />
           </Route>
           <Route element={<MainLayoutLogin />}>

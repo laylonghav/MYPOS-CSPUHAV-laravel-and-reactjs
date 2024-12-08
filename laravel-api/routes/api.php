@@ -6,6 +6,8 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProvinceController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BrandController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -26,10 +28,21 @@ Route::post("role/changestatus/{id}",[RoleController::class,'changestatus']);
 // Route::delete("categories/{id}",[CategoryController::class,'destroy']);
 // Route::post("categories/changestatus/{id}",[CategoryController::class,'changestatus']);
 
-Route::apiResource('categories', CategoryController::class);
-Route::apiResource('customer', CustomerController::class);
-Route::apiResource('province', ProvinceController::class);
+    Route::middleware(["auth:api"])->group(function () {
 
+        Route::apiResource('categories', CategoryController::class);
+        Route::apiResource('customer', CustomerController::class);
+        Route::apiResource('brands', BrandController::class);
+        Route::apiResource('province', ProvinceController::class)->withoutMiddleware('auth:api');
+
+        
+    });
+
+    // Auth
+    Route::post('register', [AuthController::class, 'register']);
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:api');
+    Route::post('refresh', [AuthController::class, 'refresh'])->middleware('auth:api');
 
 // Route::get('/role', function (Request $request) {
     
