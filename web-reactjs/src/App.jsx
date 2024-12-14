@@ -16,6 +16,7 @@ import CategoryPage from "./page/category/CategoryPage";
 import ProvincePage from "./page/province/ProvincePage";
 import CustomerPage from "./page/customer/CustomerPage";
 import BrandPage from "./page/brand/BrandPage";
+import PosPage from "./page/pos/PosPage";
 function App() {
   const [count, setCount] = useState(0);
 
@@ -32,6 +33,7 @@ function App() {
             <Route path="/province" element={<ProvincePage />} />
             <Route path="/customer" element={<CustomerPage />} />
             <Route path="/brand" element={<BrandPage />} />
+            <Route path="/pos" element={<PosPage />} />
             <Route path="*" element={<RouteNotfound />} />
           </Route>
           <Route element={<MainLayoutLogin />}>

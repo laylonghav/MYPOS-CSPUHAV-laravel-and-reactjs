@@ -8,6 +8,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProvinceController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BrandController;
+use App\Http\Controllers\ProductController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -34,6 +35,7 @@ Route::post("role/changestatus/{id}",[RoleController::class,'changestatus']);
         Route::apiResource('customer', CustomerController::class);
         Route::apiResource('brands', BrandController::class);
         Route::apiResource('province', ProvinceController::class)->withoutMiddleware('auth:api');
+        Route::apiResource('product', ProductController::class);
 
         
     });

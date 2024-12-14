@@ -1,17 +1,22 @@
 import React, { useState, useCallback } from "react";
 import "./styleProductCard.css";
 import { HeartOutlined, HeartFilled } from "@ant-design/icons";
-import { Button, message } from "antd";
+import { Button, message, Tag } from "antd";
 import { productStore } from "../../store/productStore";
+import config from "../../util/config";
 
 const ProductCard = ({
   id,
   image,
-  name,
+  product_name,
+  quantity,
+  wishlist,
+  discount,
   description,
   price,
-  discount,
-  wishlist,
+  status,
+  categories,
+  brands,
   onaddtobag,
 }) => {
   // Calculate the discounted price
@@ -19,16 +24,7 @@ const ProductCard = ({
     ? (price - (price * discount) / 100).toFixed(2)
     : price;
   const { list, handleWishlist } = productStore();
-  // const [isFavorited, setIsFavorited] = useState(false);
 
-  // // Toggle wishlist state with notification
-  // const toggleWishlist = useCallback(() => {
-  //   setIsFavorited((prev) => !prev);
-  //   message.success(
-  //     isFavorited ? "Removed from wishlist" : "Added to wishlist",
-  //     2
-  //   );
-  // }, [isFavorited]);
   const onwishlist = () => {
     // alert("Hello")
     // alert(JSON.stringify(item));
@@ -42,8 +38,8 @@ const ProductCard = ({
     <article className="product-card">
       <div className="product-image">
         <img
-          src={image}
-          alt={name}
+          src={config.image_path + image}
+          alt={product_name}
           loading="lazy"
           className="product-image-content"
         />
@@ -61,8 +57,21 @@ const ProductCard = ({
       </div>
 
       <div className="product-info">
-        <h2 className="product-name">{name}</h2>
-        <p className="product-description">{description}</p>
+        <h3 className="product-name">{product_name}</h3>
+        <p className="product-description">
+          {brands} | {categories}
+        </p>
+        <p className="">{description}</p>
+        <p className="">
+          Status :{" "}
+          {status == 1 ? (
+            <Tag color="green">Active</Tag>
+          ) : (
+            <Tag color="red">Inactive</Tag>
+          )}{" "}
+          | Quantity :{" "}
+          <Tag color={quantity > 0 ? "green" : "red"}>{quantity}</Tag>
+        </p>
 
         <div className="price-container">
           {discount ? (

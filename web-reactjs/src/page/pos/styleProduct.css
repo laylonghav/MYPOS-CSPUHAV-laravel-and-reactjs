@@ -1,0 +1,20 @@
+.Card {
+  border-radius: 1rem;
+  padding: 20px 20px;
+  background-color: #ebeaea;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
+
+.Pic-card {
+  display: flex;
+  justify-self: center;
+  align-items: center;
+  /* width: 300px; */
+  height: 250px;
+}
+
+.Pic-card > img {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
