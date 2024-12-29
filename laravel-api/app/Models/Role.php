@@ -13,4 +13,10 @@ class Role extends Model
         'status',
         'address',
     ];
+
+    public function permissions()
+    {
+        return $this->belongsToMany(Permission::class, 'permission_roles');
+    }
+
 }

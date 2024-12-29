@@ -26,7 +26,9 @@ export const profileStore = create(
     (set, get) => ({
       profile: null,
       access_token: null,
+      permission: null,
       setAccessToken: (params) => set({ access_token: params }),
+      setPermission: (params) => set({ permission: params }),
 
       setProfile: (params) =>
         set((pre) => ({ profile: { ...pre.profile, ...params } })),

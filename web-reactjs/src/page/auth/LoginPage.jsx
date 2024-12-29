@@ -10,7 +10,7 @@ const { Text } = Typography;
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const { setProfile, setAccessToken } = profileStore();
+  const { setProfile, setAccessToken, setPermission } = profileStore();
   const [loading, setLoading] = useState(false); // State for loading spinner
   const [validatePW, setValidatePW] = useState({});
   const [validateUser, setValidateUser] = useState({});
@@ -29,6 +29,7 @@ const LoginPage = () => {
       if (response && !response.errors) {
         setAccessToken(response.access_token);
         setProfile(response.user);
+        setPermission(response.permission);
         console.log(response.user.profile);
         message.success("Logged in successfully!");
         navigate("/");

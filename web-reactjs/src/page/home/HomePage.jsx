@@ -2,17 +2,27 @@ import React from "react";
 import { countStore } from "../../store/countStore";
 import { Button, Col, Row } from "antd";
 import { productStore } from "../../store/productStore";
+import { profileStore } from "../../store/profileStore";
 import ProductCard from "../../component/product/ProductCard";
 
 function HomePage() {
   const { count, increase, decrease, reset, update_count } = countStore(); // call countStore() to access Zustand store
   const { list } = productStore();
+  const { permission } = profileStore();
   const newlist = [list[0], list[1], list[2], list[3]];
 
   return (
     <div>
       <h1>HomePage</h1>
       <h1>{count}</h1>
+      <h1>
+        {permission?.map((item, index) => (
+          <div key={index}>
+            {" "}
+            {item.name} : {item.web_route_key}
+          </div>
+        ))}
+      </h1>
       <Button onClick={() => increase()}>+</Button>
       <Button onClick={() => decrease()}>-</Button>{" "}
       {/* corrected the function name */}

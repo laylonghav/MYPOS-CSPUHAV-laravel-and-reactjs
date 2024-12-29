@@ -1,6 +1,6 @@
 import "./styleMainLayout.css";
 import { TbBrandProducthunt } from "react-icons/tb";
-
+import { profileStore } from "../../store/profileStore";
 // Import FontAwesome and the specific icon you need
 // import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 // import { faBars } from "@fortawesome/free-solid-svg-icons"; // Import faBars icon
@@ -31,8 +31,8 @@ import {
   EyeOutlined,
 } from "@ant-design/icons";
 import { Dropdown, Image, Layout, Menu, Space, theme } from "antd";
-import { profileStore } from "../../store/profileStore";
-import { Outlet, useNavigate } from "react-router-dom";
+// import { profileStore } from "../../store/profileStore";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import Search from "antd/es/transfer/search";
 import { IoIosNotifications } from "react-icons/io";
 import { MdOutlineMarkEmailUnread } from "react-icons/md";
@@ -46,7 +46,7 @@ function getItem(label, key, icon, children) {
     label,
   };
 }
-const items = [
+const items_menu = [
   getItem("Dashboard", "/", <DashboardOutlined />),
   getItem("POS", "/pos", <ShoppingCartOutlined />),
   getItem("Order", "/order", <FileTextOutlined />),
@@ -74,7 +74,7 @@ const items = [
     getItem("Employee List", "/employee", <IdcardOutlined />),
     getItem("Payroll", "/payroll", <PayCircleOutlined />),
   ]),
-  getItem("User", "/user", <UserAddOutlined />, [
+  getItem("User", "user", <UserAddOutlined />, [
     getItem("User List", "/user", <UserAddOutlined />),
     getItem("User Role", "/role", <UserAddOutlined />),
     getItem("Permission", "/permission", <SettingOutlined />),
@@ -86,21 +86,74 @@ const items = [
     getItem("Province", "/province", <BranchesOutlined />),
   ]),
 ];
-
 const MainLayout = () => {
+  const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
-  const { profile, setProfile, logout } = profileStore.getState();
+  const [items, setItems] = useState([]);
+  const { profile, setProfile, logout, permission } = profileStore.getState();
   const navigate = useNavigate();
 
   useEffect(() => {
+    getMenuByUser();
+    checkIsNotPermissionViewPage();
     if (!profile) {
       navigate("/login");
     }
   }, [profile, navigate]);
+
+  const checkIsNotPermissionViewPage = () => {
+    const p1 = permission?.findIndex(
+      (data1) => "/" + data1.web_route_key == location.pathname
+    );
+    if (p1 == -1) {
+      // navigate("/404");
+      for (let i = 0; i < permission.length; i++) {
+        if (permission[i].web_route_key != "") {
+          navigate(permission[i].web_route_key);
+          break;
+        } else {
+          return null;
+        }
+      }
+    }
+  };
+
+  const getMenuByUser = () => {
+    let new_item_menu = [];
+    // level one
+    items_menu?.map((item1) => {
+      // is not exist in permission
+      const p1 = permission?.findIndex(
+        (data1) => "/" + data1.web_route_key == item1.key
+      ); // -1 | 0,1`,3.....
+      if (p1 != -1) {
+        new_item_menu.push(item1);
+      }
+
+      // level two
+      if (item1?.children && item1?.children.length > 0) {
+        let childTmp = [];
+        item1?.children.map((data1) => {
+          permission?.map((data2) => {
+            if ("/" + data2.web_route_key == data1.key) {
+              childTmp.push(data1);
+            }
+          });
+        });
+        if (childTmp.length > 0) {
+          item1.children = childTmp; // update new child dreen
+          new_item_menu.push(item1);
+        }
+      }
+    });
+    // permission?.map((item)=>{
+    // })
+    setItems(new_item_menu);
+  };
 
   if (!profile) {
     // Avoid rendering the layout if the user is not logged in
@@ -142,6 +195,7 @@ const MainLayout = () => {
         onCollapse={(value) => setCollapsed(value)}
       >
         <div className="demo-logo-vertical" />
+
         <Menu
           theme="dark"
           defaultSelectedKeys={["1"]}
@@ -189,7 +243,6 @@ const MainLayout = () => {
               }}
             >
               <div className="w-[60px] h-[60px] rounded-full overflow-hidden">
-                
                 <Image
                   preview={{
                     mask: (
@@ -205,7 +258,6 @@ const MainLayout = () => {
                         }}
                       >
                         <EyeOutlined /> {/* Eye Icon */}
-                        
                       </div>
                     ),
                   }}
@@ -227,6 +279,14 @@ const MainLayout = () => {
             margin: "10px",
           }}
         >
+          {/* <h1>
+            {permission?.map((item, index) => (
+              <div key={index}>
+                {" "}
+                {item.name} : {item.web_route_key} -{location.pathname}
+              </div>
+            ))}
+          </h1> */}
           <div
             className="p-4 min-h-[calc(100vh-100px)]"
             style={{

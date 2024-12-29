@@ -22,7 +22,7 @@ import {
 import { MdAdd, MdEdit } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
 import { request } from "../../util/request";
-import { dateClient, dateServer } from "../../util/helper";
+import { dateClient, dateServer, isPermission } from "../../util/helper";
 import { PlusOutlined } from "@ant-design/icons";
 import MainPage from "../../component/layout/MainPage";
 import config from "../../util/config";
@@ -240,42 +240,41 @@ function BrandPage() {
     }));
   };
 
-const onClickDelete = (item) => {
-  Modal.confirm({
-    title: "Remove",
-    content: "Are you sure you want to remove this item?",
-    onOk: async () => {
-      setState((pre) => ({
-        ...pre,
-        loading: true,
-      })); // Set loading state to true
-      try {
-        const res = await request("product/" + item.id, "delete");
-        if (res && !res.errors) {
-          // Handle successful deletion
-          message.success("Delete Successfully!");
-          getlist(); // Refresh the list
-        } else {
-          message.error(
-            res?.errors || "Failed to delete the item. Please try again."
-          );
-        }
-      } catch (errors) {
-        message.error("An error occurred while deleting the item.");
-        console.error(errors); // Log for debugging
-      } finally {
+  const onClickDelete = (item) => {
+    Modal.confirm({
+      title: "Remove",
+      content: "Are you sure you want to remove this item?",
+      onOk: async () => {
         setState((pre) => ({
           ...pre,
-          loading: false,
-        })); // Reset loading state
-      }
-    },
-    onCancel: () => {
-      message.info("Delete action was canceled.");
-    },
-  });
-};
-
+          loading: true,
+        })); // Set loading state to true
+        try {
+          const res = await request("product/" + item.id, "delete");
+          if (res && !res.errors) {
+            // Handle successful deletion
+            message.success("Delete Successfully!");
+            getlist(); // Refresh the list
+          } else {
+            message.error(
+              res?.errors || "Failed to delete the item. Please try again."
+            );
+          }
+        } catch (errors) {
+          message.error("An error occurred while deleting the item.");
+          console.error(errors); // Log for debugging
+        } finally {
+          setState((pre) => ({
+            ...pre,
+            loading: false,
+          })); // Reset loading state
+        }
+      },
+      onCancel: () => {
+        message.info("Delete action was canceled.");
+      },
+    });
+  };
 
   const handleFilter = () => {
     getlist();
@@ -378,9 +377,11 @@ const onClickDelete = (item) => {
               Filter
             </Button>
           </Space>
-          <Button type="primary" icon={<MdAdd />} onClick={onClickAddbtn}>
-            New
-          </Button>
+          {isPermission("Product.Create") && (
+            <Button type="primary" icon={<MdAdd />} onClick={onClickAddbtn}>
+              New
+            </Button>
+          )}
         </div>
         <Modal
           open={state.VisibleModule}
@@ -653,19 +654,27 @@ const onClickDelete = (item) => {
               title: "Action",
               key: "Action",
               align: "center",
+              hidden:
+                isPermission("Product.Update") || isPermission("Product.Remove")
+                  ? false
+                  : true,
               render: (item, data, index) => (
                 <Space>
-                  <Button
-                    type="primary"
-                    icon={<MdEdit />}
-                    onClick={() => onClickEdit(data, index)}
-                  />
-                  <Button
-                    type="primary"
-                    danger
-                    icon={<MdDelete />}
-                    onClick={() => onClickDelete(data, index)}
-                  />
+                  {isPermission("Product.Update") && (
+                    <Button
+                      type="primary"
+                      icon={<MdEdit />}
+                      onClick={() => onClickEdit(data, index)}
+                    />
+                  )}
+                  {isPermission("Product.Remove") && (
+                    <Button
+                      type="primary"
+                      danger
+                      icon={<MdDelete />}
+                      onClick={() => onClickDelete(data, index)}
+                    />
+                  )}
                 </Space>
               ),
             },
